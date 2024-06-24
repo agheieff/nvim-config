@@ -25,6 +25,9 @@ vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
 
 vim.opt.updatetime = 250
+vim.opt.tabstop = 8
+vim.opt.shiftwidth = 8
+vim.opt.expandtab = false
 
 vim.opt.timeoutlen = 300
 
@@ -80,7 +83,10 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
---
+local ai_api = require 'ai_api'
+
+vim.api.nvim_set_keymap('n', '<leader>,', ':lua require("ai_api").askAI()<CR>', { noremap = true, silent = true })
+
 require('lazy').setup({
   'tpope/vim-sleuth',
   -- Use `opts = {}` to force a plugin to be loaded.
@@ -761,19 +767,6 @@ require('lazy').setup({
     },
   },
 })
-
-vim.keymap.set('n', '<leader>m', function()
-  require('llm').create_llm_md()
-end)
-vim.keymap.set('n', '<leader>,', function()
-  require('llm').prompt { replace = false, service = 'anthropic' }
-end)
-vim.keymap.set('v', '<leader>,', function()
-  require('llm').prompt { replace = false, service = 'anthropic' }
-end)
-vim.keymap.set('v', '<leader>.', function()
-  require('llm').prompt { replace = true, service = 'anthropic' }
-end)
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
