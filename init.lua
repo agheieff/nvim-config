@@ -32,11 +32,12 @@ vim.opt.expandtab = false
 vim.cmd([[
 augroup html_indentation
     autocmd!
-    autocmd FileType html setlocal shiftwidth=4 tabstop=4
+    autocmd FileType html,xml,ui setlocal shiftwidth=4 tabstop=4
 augroup END
 ]])
 
 vim.opt.timeoutlen = 300
+
 
 vim.opt.splitright = true
 vim.opt.splitbelow = true
@@ -94,33 +95,15 @@ vim.api.nvim_set_keymap('n', '<leader>,', ':lua require("ai_api").askAI()<CR>', 
 
 require('lazy').setup({
   'tpope/vim-sleuth',
-  -- Use `opts = {}` to force a plugin to be loaded.
-  --
-  --  This is equivalent to:
-  --    require('Comment').setup({})
-
-  -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
-
-  -- Here is a more advanced example where we pass configuration
-  -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
-  --    require('gitsigns').setup({ ... })
-  --
-  -- See `:help gitsigns` to understand what the configuration keys do
 
   {
     'folke/tokyonight.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
-
-      -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
-    end,
+    lazy = false,
+    priority = 1000,
+    opts = {}
   },
+
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
@@ -252,27 +235,10 @@ require('lazy').setup({
     end,
   },
 
-}, {
-  ui = {
-    -- If you are using a Nerd Font: set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
-    },
-  },
 })
+
+vim.cmd[[colorscheme tokyonight]];
+
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
