@@ -29,6 +29,13 @@ vim.opt.tabstop = 8
 vim.opt.shiftwidth = 8
 vim.opt.expandtab = false
 
+vim.cmd([[
+augroup html_indentation
+    autocmd!
+    autocmd FileType html setlocal shiftwidth=4 tabstop=4
+augroup END
+]])
+
 vim.opt.timeoutlen = 300
 
 vim.opt.splitright = true
@@ -82,8 +89,6 @@ if not vim.loop.fs_stat(lazypath) then
   vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
-
-local ai_api = require 'ai_api'
 
 vim.api.nvim_set_keymap('n', '<leader>,', ':lua require("ai_api").askAI()<CR>', { noremap = true, silent = true })
 
@@ -212,6 +217,41 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
+  --
+  {
+    'yacineMTB/dingllm.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function()
+      local system_prompt =
+        'You should replace the code that you are sent, only following the comments. Do not talk at all. Only output valid code. Do not provide any backticks that surround the code. Never ever output backticks like this ```. Any comment that is asking you for something should be removed after you satisfy them. Other comments should left alone. Do not output backticks'
+      local helpful_prompt = 'You are a helpful assistant. What I have sent are my notes so far. You are very curt, yet helpful.'
+      local dingllm = require 'dingllm'
+
+      local function anthropic_help()
+        dingllm.invoke_llm_and_stream_into_editor({
+          url = 'https://api.anthropic.com/v1/messages',
+          model = 'claude-3-5-sonnet-20240620',
+          api_key_name = 'ANTHROPIC_API_KEY',
+          system_prompt = helpful_prompt,
+          replace = false,
+        }, dingllm.make_anthropic_spec_curl_args, dingllm.handle_anthropic_spec_data)
+      end
+
+      local function anthropic_replace()
+        dingllm.invoke_llm_and_stream_into_editor({
+          url = 'https://api.anthropic.com/v1/messages',
+          model = 'claude-3-5-sonnet-20240620',
+          api_key_name = 'ANTHROPIC_API_KEY',
+          system_prompt = system_prompt,
+          replace = true,
+        }, dingllm.make_anthropic_spec_curl_args, dingllm.handle_anthropic_spec_data)
+      end
+
+      vim.keymap.set({ 'n', 'v' }, '<leader>.', anthropic_help, { desc = 'llm anthropic_help' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>,', anthropic_replace, { desc = 'llm anthropic' })
+    end,
+  },
+
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
