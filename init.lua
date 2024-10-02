@@ -19,7 +19,7 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.cmd([[
 augroup fourSpacesIndent
     autocmd!
-    autocmd FileType html,xml,ui setlocal shiftwidth=4 tabstop=4 expandtab=false
+    autocmd FileType html,xml,ui setlocal shiftwidth=4 tabstop=4 noexpandtab
 augroup END
 ]])
 
